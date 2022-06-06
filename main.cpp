@@ -82,6 +82,9 @@ int main()
     vbo.unbind();
     ebo.unbind();
 
+    // uniform
+    GLuint u_scale = glGetUniformLocation(shader.m_id, "scale");
+
     // Game loop
     while (!glfwWindowShouldClose(window))
     {
@@ -95,6 +98,7 @@ int main()
 
         // Draw
         shader.use();
+        glUniform1f(u_scale, 1.5);
         vao.bind();
         glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(indices[0]), GL_UNSIGNED_INT, (void*)0);
 

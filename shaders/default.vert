@@ -5,7 +5,9 @@ layout (location = 1) in vec3 aColor;
 
 out vec3 color;
 
+uniform float scale;
+
 void main() {
-   gl_Position = vec4(aPos, 1.0);
+   gl_Position = vec4(aPos * scale, 1.0);
    color = aColor;
 }
