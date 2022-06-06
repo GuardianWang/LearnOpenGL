@@ -16,5 +16,8 @@ public:
 
 public:
 	GLuint m_id;
+
+private:
+	void compileErrors(unsigned int shader, const char* type);
 };
 
