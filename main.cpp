@@ -5,6 +5,7 @@
 #include "Shader.h"
 #include "Objects/VAO.h"
 #include "Objects/BO.h"
+#include "Objects/Texture.h";
 
 // Function prototypes
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
@@ -14,21 +15,18 @@ const GLuint WIDTH = 800, HEIGHT = 600;
 
 // Vertices coordinates
 GLfloat vertices[] =
-{ //               COORDINATES                  /     COLORS           //
-    -0.5f, -0.5f * float(sqrt(3)) * 1 / 3, 0.0f,     0.8f, 0.3f,  0.02f, // Lower left corner
-     0.5f, -0.5f * float(sqrt(3)) * 1 / 3, 0.0f,     0.8f, 0.3f,  0.02f, // Lower right corner
-     0.0f,  0.5f * float(sqrt(3)) * 2 / 3, 0.0f,     1.0f, 0.6f,  0.32f, // Upper corner
-    -0.25f, 0.5f * float(sqrt(3)) * 1 / 6, 0.0f,     0.9f, 0.45f, 0.17f, // Inner left
-     0.25f, 0.5f * float(sqrt(3)) * 1 / 6, 0.0f,     0.9f, 0.45f, 0.17f, // Inner right
-     0.0f, -0.5f * float(sqrt(3)) * 1 / 3, 0.0f,     0.8f, 0.3f,  0.02f  // Inner down
+{ //     COORDINATES     /        COLORS      /   TexCoord  //
+    -0.5f, -0.5f, 0.0f,     1.0f, 0.0f, 0.0f,	0.0f, 0.0f, // Lower left corner
+    -0.5f,  0.5f, 0.0f,     0.0f, 1.0f, 0.0f,	0.0f, 1.0f, // Upper left corner
+     0.5f,  0.5f, 0.0f,     0.0f, 0.0f, 1.0f,	1.0f, 1.0f, // Upper right corner
+     0.5f, -0.5f, 0.0f,     1.0f, 1.0f, 1.0f,	1.0f, 0.0f  // Lower right corner
 };
 
 // Indices for vertices order
 GLuint indices[] =
 {
-    0, 3, 5, // Lower left triangle
-    3, 2, 4, // Lower right triangle
-    5, 4, 1 // Upper triangle
+    0, 2, 1, // Upper triangle
+    0, 3, 2 // Lower triangle
 };
 
 // The MAIN function, from here we start the application and run the game loop
@@ -76,14 +74,21 @@ int main()
     auto vao = VAO();
     auto vbo = BO(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     auto ebo = BO(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-    vao.link(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-    vao.link(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    vao.link(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    vao.link(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    vao.link(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     vao.unbind();
     vbo.unbind();
     ebo.unbind();
 
+    // texture
+    Texture tex("images/luffy.png", GL_TEXTURE_2D, GL_TEXTURE0, 0, GL_RGBA, 0, GL_RGBA, GL_UNSIGNED_BYTE);
+
     // uniform
     GLuint u_scale = glGetUniformLocation(shader.m_id, "scale");
+    shader.use();
+    glUniform1f(u_scale, 1.5);
+    tex.uniform("tex0", 0);
 
     // Game loop
     while (!glfwWindowShouldClose(window))
@@ -98,8 +103,8 @@ int main()
 
         // Draw
         shader.use();
-        glUniform1f(u_scale, 1.5);
         vao.bind();
+        tex.bind();
         glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(indices[0]), GL_UNSIGNED_INT, (void*)0);
 
         // Swap the screen buffers
@@ -108,6 +113,8 @@ int main()
 
     // Delete
     vao.unlink(0);
+    vao.unlink(1);
+    vao.unlink(2);
 
     // Terminates GLFW, clearing any resources allocated by GLFW.
     glfwTerminate();

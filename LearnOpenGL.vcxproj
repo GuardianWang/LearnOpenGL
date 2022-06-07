@@ -75,7 +75,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>E:\glfw\glfw-3.3.7.bin.WIN64\include;E:\glad\glad-gl3.3\include;$(IncludePath)</IncludePath>
+    <IncludePath>E:\glfw\glfw-3.3.7.bin.WIN64\include;E:\stb;E:\glad\glad-gl3.3\include;$(IncludePath)</IncludePath>
     <LibraryPath>E:\glfw\glfw-3.3.7.bin.WIN64\lib-vc2019;$(LibraryPath)</LibraryPath>
     <SourcePath>E:\glad\glad-gl3.3\src;$(SourcePath)</SourcePath>
   </PropertyGroup>
@@ -86,7 +86,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>E:\glfw\glfw-3.3.7.bin.WIN64\include;E:\glad\glad-gl3.3\include;$(IncludePath)</IncludePath>
+    <IncludePath>E:\glfw\glfw-3.3.7.bin.WIN64\include;E:\stb;E:\glad\glad-gl3.3\include;$(IncludePath)</IncludePath>
     <LibraryPath>E:\glfw\glfw-3.3.7.bin.WIN64\lib-vc2019;$(LibraryPath)</LibraryPath>
     <SourcePath>E:\glad\glad-gl3.3\src;$(SourcePath)</SourcePath>
   </PropertyGroup>
@@ -154,13 +154,23 @@
     <ClCompile Include="..\..\..\..\glad\glad-gl3.3\src\gl.c" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Objects\BO.cpp" />
+    <ClCompile Include="Objects\Texture.cpp" />
     <ClCompile Include="Objects\VAO.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Objects\BO.h" />
+    <ClInclude Include="Objects\Texture.h" />
     <ClInclude Include="Objects\VAO.h" />
     <ClInclude Include="Shader.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\default.frag" />
+    <None Include="shaders\default.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="images\luffy.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
