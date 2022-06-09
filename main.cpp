@@ -1,6 +1,9 @@
 #include <iostream>
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
+#include<glm/glm.hpp>
+#include<glm/gtc/matrix_transform.hpp>
+#include<glm/gtc/type_ptr.hpp>
 
 #include "Shader.h"
 #include "Objects/VAO.h"
@@ -16,17 +19,22 @@ const GLuint WIDTH = 800, HEIGHT = 600;
 // Vertices coordinates
 GLfloat vertices[] =
 { //     COORDINATES     /        COLORS      /   TexCoord  //
-    -0.5f, -0.5f, 0.0f,     1.0f, 0.0f, 0.0f,	0.0f, 0.0f, // Lower left corner
-    -0.5f,  0.5f, 0.0f,     0.0f, 1.0f, 0.0f,	0.0f, 1.0f, // Upper left corner
-     0.5f,  0.5f, 0.0f,     0.0f, 0.0f, 1.0f,	1.0f, 1.0f, // Upper right corner
-     0.5f, -0.5f, 0.0f,     1.0f, 1.0f, 1.0f,	1.0f, 0.0f  // Lower right corner
+    -0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
+    -0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	5.0f, 0.0f,
+     0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
+     0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	5.0f, 0.0f,
+     0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	2.5f, 5.0f
 };
 
 // Indices for vertices order
 GLuint indices[] =
 {
-    0, 2, 1, // Upper triangle
-    0, 3, 2 // Lower triangle
+    0, 1, 2,
+    0, 2, 3,
+    0, 1, 4,
+    1, 2, 4,
+    2, 3, 4,
+    3, 0, 4
 };
 
 // The MAIN function, from here we start the application and run the game loop
@@ -86,10 +94,19 @@ int main()
 
     // uniform
     GLuint u_scale = glGetUniformLocation(shader.m_id, "scale");
+    GLuint u_model = glGetUniformLocation(shader.m_id, "model");
+    GLuint u_view = glGetUniformLocation(shader.m_id, "view");
+    GLuint u_proj = glGetUniformLocation(shader.m_id, "proj");
     shader.use();
-    glUniform1f(u_scale, 1.5);
+    glUniform1f(u_scale, 1.);
     tex.uniform("tex0", 0);
 
+    // depth
+    glEnable(GL_DEPTH_TEST);
+
+    float rotation = 0.;
+    auto start = glfwGetTime();
+    
     // Game loop
     while (!glfwWindowShouldClose(window))
     {
@@ -99,7 +116,22 @@ int main()
         // Render
         // Clear the colorbuffer
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // matrix
+        auto curr = glfwGetTime();
+        rotation = glm::mod(100 * (curr - start), 360.);
+        auto model = glm::mat4(1.);
+        model = glm::rotate(model, glm::radians(rotation), glm::vec3(0., 1., 0.));
+        glUniformMatrix4fv(u_model, 1, GL_FALSE, glm::value_ptr(model));
+
+        auto view = glm::mat4(1.);
+        view = glm::translate(view, glm::vec3(0.f, -.2f, -2.f));
+        glUniformMatrix4fv(u_view, 1, GL_FALSE, glm::value_ptr(view));
+
+        auto proj = glm::perspective(glm::radians(45.f), (float)WIDTH / HEIGHT, 0.01f, 200.f);
+        glUniformMatrix4fv(u_proj, 1, GL_FALSE, glm::value_ptr(proj));
+        
 
         // Draw
         shader.use();
