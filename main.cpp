@@ -9,6 +9,7 @@
 #include "Objects/VAO.h"
 #include "Objects/BO.h"
 #include "Objects/Texture.h";
+#include "Camera.h"
 
 // Function prototypes
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
@@ -95,11 +96,13 @@ int main()
     // uniform
     GLuint u_scale = glGetUniformLocation(shader.m_id, "scale");
     GLuint u_model = glGetUniformLocation(shader.m_id, "model");
-    GLuint u_view = glGetUniformLocation(shader.m_id, "view");
-    GLuint u_proj = glGetUniformLocation(shader.m_id, "proj");
+    GLuint u_camera = glGetUniformLocation(shader.m_id, "camera");
     shader.use();
     glUniform1f(u_scale, 1.);
     tex.uniform("tex0", 0);
+
+    // camera
+    Camera camera(WIDTH, HEIGHT);
 
     // depth
     glEnable(GL_DEPTH_TEST);
@@ -125,14 +128,10 @@ int main()
         model = glm::rotate(model, glm::radians(rotation), glm::vec3(0., 1., 0.));
         glUniformMatrix4fv(u_model, 1, GL_FALSE, glm::value_ptr(model));
 
-        auto view = glm::mat4(1.);
-        view = glm::translate(view, glm::vec3(0.f, -.2f, -2.f));
-        glUniformMatrix4fv(u_view, 1, GL_FALSE, glm::value_ptr(view));
-
-        auto proj = glm::perspective(glm::radians(45.f), (float)WIDTH / HEIGHT, 0.01f, 200.f);
-        glUniformMatrix4fv(u_proj, 1, GL_FALSE, glm::value_ptr(proj));
+        camera.control(window);
+        auto cam_mat = camera.getMatrix();
+        glUniformMatrix4fv(u_camera, 1, GL_FALSE, glm::value_ptr(cam_mat));
         
-
         // Draw
         shader.use();
         vao.bind();

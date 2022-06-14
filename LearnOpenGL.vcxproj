@@ -152,6 +152,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\glad\glad-gl3.3\src\gl.c" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Objects\BO.cpp" />
     <ClCompile Include="Objects\Texture.cpp" />
@@ -160,6 +161,7 @@
     <ClCompile Include="stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="Objects\BO.h" />
     <ClInclude Include="Objects\Texture.h" />
     <ClInclude Include="Objects\VAO.h" />
