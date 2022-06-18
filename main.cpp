@@ -38,6 +38,34 @@ GLuint indices[] =
     3, 0, 4
 };
 
+GLfloat lightVertices[] =
+{ //     COORDINATES     //
+    -0.1f, -0.1f,  0.1f,
+    -0.1f, -0.1f, -0.1f,
+     0.1f, -0.1f, -0.1f,
+     0.1f, -0.1f,  0.1f,
+    -0.1f,  0.1f,  0.1f,
+    -0.1f,  0.1f, -0.1f,
+     0.1f,  0.1f, -0.1f,
+     0.1f,  0.1f,  0.1f
+};
+
+GLuint lightIndices[] =
+{
+    0, 1, 2,
+    0, 2, 3,
+    0, 4, 7,
+    0, 7, 3,
+    3, 7, 6,
+    3, 6, 2,
+    2, 6, 5,
+    2, 5, 1,
+    1, 5, 4,
+    1, 4, 0,
+    4, 5, 6,
+    4, 6, 7
+};
+
 // The MAIN function, from here we start the application and run the game loop
 int main()
 {
@@ -78,6 +106,7 @@ int main()
     glViewport(0, 0, WIDTH, HEIGHT);
 
     auto shader = Shader("shaders/default.vert", "shaders/default.frag");
+    auto lightShader = Shader("shaders/light.vert", "shaders/light.frag");
 
     // buffer
     auto vao = VAO();
@@ -90,13 +119,37 @@ int main()
     vbo.unbind();
     ebo.unbind();
 
+    auto vaoLight = VAO();
+    auto vboLight = BO(GL_ARRAY_BUFFER, sizeof(lightVertices), lightVertices, GL_STATIC_DRAW);
+    auto eboLight = BO(GL_ELEMENT_ARRAY_BUFFER, sizeof(lightIndices), lightIndices, GL_STATIC_DRAW);
+    vaoLight.link(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    vaoLight.unbind();
+    vboLight.unbind();
+    eboLight.unbind();
+
+    // light 
+    glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+    glm::vec3 lightPos = glm::vec3(1.f);
+    glm::mat4 lightModel = glm::mat4(1.0f);
+    lightModel = glm::translate(lightModel, lightPos);
+
     // texture
     Texture tex("images/luffy.png", GL_TEXTURE_2D, GL_TEXTURE0, 0, GL_RGBA, 0, GL_RGBA, GL_UNSIGNED_BYTE);
 
     // uniform
+    
+    GLuint u_light = glGetUniformLocation(lightShader.m_id, "model");
+    GLuint u_lightCamera = glGetUniformLocation(lightShader.m_id, "camera");
+    GLuint u_lightColor = glGetUniformLocation(lightShader.m_id, "lightColor");
+
     GLuint u_scale = glGetUniformLocation(shader.m_id, "scale");
     GLuint u_model = glGetUniformLocation(shader.m_id, "model");
     GLuint u_camera = glGetUniformLocation(shader.m_id, "camera");
+
+    lightShader.use();
+    glUniformMatrix4fv(u_light, 1, GL_FALSE, glm::value_ptr(lightModel));
+    glUniform4f(u_lightColor, lightColor.r, lightColor.g, lightColor.b, lightColor.a);
+
     shader.use();
     glUniform1f(u_scale, 1.);
     tex.uniform("tex0", 0);
@@ -126,17 +179,22 @@ int main()
         rotation = glm::mod(100 * (curr - start), 360.);
         auto model = glm::mat4(1.);
         model = glm::rotate(model, glm::radians(rotation), glm::vec3(0., 1., 0.));
-        glUniformMatrix4fv(u_model, 1, GL_FALSE, glm::value_ptr(model));
 
         camera.control(window);
         auto cam_mat = camera.getMatrix();
-        glUniformMatrix4fv(u_camera, 1, GL_FALSE, glm::value_ptr(cam_mat));
         
         // Draw
         shader.use();
         vao.bind();
         tex.bind();
+        glUniformMatrix4fv(u_model, 1, GL_FALSE, glm::value_ptr(model));
+        glUniformMatrix4fv(u_camera, 1, GL_FALSE, glm::value_ptr(cam_mat));
         glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(indices[0]), GL_UNSIGNED_INT, (void*)0);
+
+        lightShader.use();
+        vaoLight.bind();
+        glUniformMatrix4fv(u_lightCamera, 1, GL_FALSE, glm::value_ptr(cam_mat));
+        glDrawElements(GL_TRIANGLES, sizeof(lightIndices) / sizeof(lightIndices[0]), GL_UNSIGNED_INT, (void*)0);
 
         // Swap the screen buffers
         glfwSwapBuffers(window);
@@ -146,6 +204,7 @@ int main()
     vao.unlink(0);
     vao.unlink(1);
     vao.unlink(2);
+    vaoLight.unlink(0);
 
     // Terminates GLFW, clearing any resources allocated by GLFW.
     glfwTerminate();

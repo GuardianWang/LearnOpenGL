@@ -70,6 +70,12 @@
     <None Include="shaders\default.frag">
       <Filter>Resource Files\shaders</Filter>
     </None>
+    <None Include="shaders\light.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="shaders\light.vert">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="images\luffy.png">
