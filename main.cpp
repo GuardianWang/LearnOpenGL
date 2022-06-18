@@ -19,23 +19,38 @@ const GLuint WIDTH = 800, HEIGHT = 600;
 
 // Vertices coordinates
 GLfloat vertices[] =
-{ //     COORDINATES     /        COLORS      /   TexCoord  //
-    -0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
-    -0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	5.0f, 0.0f,
-     0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
-     0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	5.0f, 0.0f,
-     0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	2.5f, 5.0f
+{ //     COORDINATES     /        COLORS          /    TexCoord   /        NORMALS       //
+    -0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f, 	 0.0f, 0.0f,      0.0f, -1.0f, 0.0f, // Bottom side
+    -0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 0.0f, 5.0f,      0.0f, -1.0f, 0.0f, // Bottom side
+     0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 5.0f,      0.0f, -1.0f, 0.0f, // Bottom side
+     0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.0f, -1.0f, 0.0f, // Bottom side
+
+    -0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f, 	 0.0f, 0.0f,     -0.8f, 0.5f,  0.0f, // Left Side
+    -0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,     -0.8f, 0.5f,  0.0f, // Left Side
+     0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,     -0.8f, 0.5f,  0.0f, // Left Side
+
+    -0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.0f, 0.5f, -0.8f, // Non-facing side
+     0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 0.0f, 0.0f,      0.0f, 0.5f, -0.8f, // Non-facing side
+     0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,      0.0f, 0.5f, -0.8f, // Non-facing side
+
+     0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 0.0f, 0.0f,      0.8f, 0.5f,  0.0f, // Right side
+     0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.8f, 0.5f,  0.0f, // Right side
+     0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,      0.8f, 0.5f,  0.0f, // Right side
+
+     0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.0f, 0.5f,  0.8f, // Facing side
+    -0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f, 	 0.0f, 0.0f,      0.0f, 0.5f,  0.8f, // Facing side
+     0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,      0.0f, 0.5f,  0.8f  // Facing side
 };
 
 // Indices for vertices order
 GLuint indices[] =
 {
-    0, 1, 2,
-    0, 2, 3,
-    0, 1, 4,
-    1, 2, 4,
-    2, 3, 4,
-    3, 0, 4
+    0, 1, 2, // Bottom side
+    0, 2, 3, // Bottom side
+    4, 6, 5, // Left side
+    7, 9, 8, // Non-facing side
+    10, 12, 11, // Right side
+    13, 15, 14 // Facing side
 };
 
 GLfloat lightVertices[] =
@@ -112,9 +127,10 @@ int main()
     auto vao = VAO();
     auto vbo = BO(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     auto ebo = BO(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-    vao.link(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-    vao.link(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    vao.link(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    vao.link(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)0);
+    vao.link(1, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(3 * sizeof(float)));
+    vao.link(2, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(6 * sizeof(float)));
+    vao.link(3, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(8 * sizeof(float)));
     vao.unbind();
     vbo.unbind();
     ebo.unbind();
@@ -128,7 +144,7 @@ int main()
     eboLight.unbind();
 
     // light 
-    glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+    glm::vec4 lightColor = glm::vec4(1.0f);
     glm::vec3 lightPos = glm::vec3(1.f);
     glm::mat4 lightModel = glm::mat4(1.0f);
     lightModel = glm::translate(lightModel, lightPos);
@@ -145,6 +161,9 @@ int main()
     GLuint u_scale = glGetUniformLocation(shader.m_id, "scale");
     GLuint u_model = glGetUniformLocation(shader.m_id, "model");
     GLuint u_camera = glGetUniformLocation(shader.m_id, "camera");
+    GLuint u_pyramidLightColor = glGetUniformLocation(shader.m_id, "lightColor");
+    GLuint u_pyramidLightPos = glGetUniformLocation(shader.m_id, "lightPos");
+    GLuint u_camPos = glGetUniformLocation(shader.m_id, "camPos");
 
     lightShader.use();
     glUniformMatrix4fv(u_light, 1, GL_FALSE, glm::value_ptr(lightModel));
@@ -152,6 +171,8 @@ int main()
 
     shader.use();
     glUniform1f(u_scale, 1.);
+    glUniform4f(u_pyramidLightColor, lightColor.r, lightColor.g, lightColor.b, lightColor.a);
+    glUniform3f(u_pyramidLightPos, lightPos.x, lightPos.y, lightPos.z);
     tex.uniform("tex0", 0);
 
     // camera
@@ -171,7 +192,7 @@ int main()
 
         // Render
         // Clear the colorbuffer
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor(0.f, 0.f, 0.f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // matrix
@@ -189,6 +210,7 @@ int main()
         tex.bind();
         glUniformMatrix4fv(u_model, 1, GL_FALSE, glm::value_ptr(model));
         glUniformMatrix4fv(u_camera, 1, GL_FALSE, glm::value_ptr(cam_mat));
+        glUniform3f(u_camPos, camera.m_position.x, camera.m_position.y, camera.m_position.z);
         glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(indices[0]), GL_UNSIGNED_INT, (void*)0);
 
         lightShader.use();
@@ -204,6 +226,7 @@ int main()
     vao.unlink(0);
     vao.unlink(1);
     vao.unlink(2);
+    vao.unlink(3);
     vaoLight.unlink(0);
 
     // Terminates GLFW, clearing any resources allocated by GLFW.
