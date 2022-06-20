@@ -8,6 +8,7 @@ in vec3 worldCoord;
 out vec4 FragColor;
 
 uniform sampler2D tex0;
+uniform sampler2D tex1;
 uniform vec4 lightColor;
 uniform vec3 lightPos;
 uniform vec3 camPos;
@@ -22,7 +23,8 @@ void main() {
 	vec3 reflectDir = reflect(-vert2light, normal);
 	vec3 vert2eye = normalize(camPos - worldCoord);
 	float specAmount = pow(max(dot(vert2eye, reflectDir), 0.0f), 8);
-	specular *= specAmount;
+	specular = specular * specAmount * texture(tex1, texCoord).r;
 
-	FragColor = texture(tex0, texCoord) * lightColor * (diffuse + ambient + specular);
+	FragColor = texture(tex0, texCoord) * lightColor * (diffuse + ambient) + 
+				specular * lightColor;
 }
