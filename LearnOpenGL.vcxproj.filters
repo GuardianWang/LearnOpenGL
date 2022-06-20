@@ -81,5 +81,11 @@
     <Image Include="images\luffy.png">
       <Filter>Resource Files\textures</Filter>
     </Image>
+    <Image Include="images\planksSpec.png">
+      <Filter>Resource Files\textures</Filter>
+    </Image>
+    <Image Include="images\planks.png">
+      <Filter>Resource Files\textures</Filter>
+    </Image>
   </ItemGroup>
 </Project>
