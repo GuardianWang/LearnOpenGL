@@ -1,11 +1,12 @@
 #include "Texture.h"
 
-Texture::Texture() : m_target(GL_TEXTURE_2D) {
+Texture::Texture() : m_target(GL_TEXTURE_2D), m_texture(GL_TEXTURE0) {
 	glGenTextures(1, &m_id);
 }
 
 Texture::Texture(const char* path, GLenum target, GLenum texture, 
-	GLuint level, GLuint internalformat, GLint border, GLenum format, GLenum type) : m_target(target) {
+	GLuint level, GLuint internalformat, GLint border, GLenum format, GLenum type) : 
+	m_target(target), m_texture(texture) {
 	// read image
 	int w, h, c;
 	stbi_set_flip_vertically_on_load(true);
@@ -13,7 +14,7 @@ Texture::Texture(const char* path, GLenum target, GLenum texture,
 	
 	// texture
 	glGenTextures(1, &m_id);
-	glActiveTexture(texture);
+	
 	bind();
 
 	// Configures the type of algorithm that is used to make the image smaller or bigger
@@ -36,6 +37,7 @@ Texture::~Texture() {
 }
 
 void Texture::bind() {
+	glActiveTexture(m_texture);
 	glBindTexture(m_target, m_id);
 }
 
@@ -43,7 +45,8 @@ void Texture::unbind() {
 	glBindTexture(m_target, 0);
 }
 
-void Texture::uniform(const GLchar* name, GLint v0) {
-	GLuint u_tex = glGetUniformLocation(m_id, name);
+void Texture::uniform(GLint shaderId, const GLchar* name, GLint v0) {
+	glUseProgram(shaderId);
+	GLuint u_tex = glGetUniformLocation(shaderId, name);
 	glUniform1i(u_tex, v0);
 }

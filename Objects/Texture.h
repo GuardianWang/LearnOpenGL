@@ -11,10 +11,11 @@ public:
 	~Texture();
 	void bind();
 	void unbind();
-	void uniform(const GLchar* name, GLint v0);
+	void uniform(GLint shaderId, const GLchar* name, GLint v0);
 
 public:
 	GLuint m_id;
 	GLenum m_target;
+	GLenum m_texture;
 };
 
