@@ -130,7 +130,8 @@ int main()
     lightModel = glm::translate(lightModel, lightPos);
 
     // texture
-    Texture tex("images/luffy.png", GL_TEXTURE_2D, GL_TEXTURE0, 0, GL_RGBA, 0, GL_RGBA, GL_UNSIGNED_BYTE);
+    Texture tex("images/planks.png", GL_TEXTURE_2D, GL_TEXTURE0, 0, GL_RGBA, 0, GL_RGBA, GL_UNSIGNED_BYTE);
+    Texture texSpecLight("images/planksSpec.png", GL_TEXTURE_2D, GL_TEXTURE1, 0, GL_RGBA, 0, GL_RED, GL_UNSIGNED_BYTE);
 
     // uniform
     
@@ -150,10 +151,11 @@ int main()
     glUniform4f(u_lightColor, lightColor.r, lightColor.g, lightColor.b, lightColor.a);
 
     shader.use();
-    glUniform1f(u_scale, 1.);
+    glUniform1f(u_scale, 3.);
     glUniform4f(u_pyramidLightColor, lightColor.r, lightColor.g, lightColor.b, lightColor.a);
     glUniform3f(u_pyramidLightPos, lightPos.x, lightPos.y, lightPos.z);
-    tex.uniform("tex0", 0);
+    tex.uniform(shader.m_id, "tex0", 0);
+    texSpecLight.uniform(shader.m_id, "tex1", 1);
 
     // camera
     Camera camera(WIDTH, HEIGHT);
@@ -172,7 +174,7 @@ int main()
 
         // Render
         // Clear the colorbuffer
-        glClearColor(0.f, 0.f, 0.f, 1.0f);
+        glClearColor(0.f, 0.f, .5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // matrix
@@ -188,6 +190,7 @@ int main()
         shader.use();
         vao.bind();
         tex.bind();
+        texSpecLight.bind();
         glUniformMatrix4fv(u_model, 1, GL_FALSE, glm::value_ptr(model));
         glUniformMatrix4fv(u_camera, 1, GL_FALSE, glm::value_ptr(cam_mat));
         glUniform3f(u_camPos, camera.m_position.x, camera.m_position.y, camera.m_position.z);
